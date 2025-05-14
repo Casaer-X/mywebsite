@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN"></html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>欢迎来到言夏的假日小居</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #444;
+        }
+        nav a {
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+        }
+        nav a:hover {
+            background-color: #555;
+        }
+        #info-modules {
+            display: flex;
+            justify-content: space-between;
+            background-color: #f4f4f4;
+            padding: 10px 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .time, .weather {
+            flex: 1;
+            text-align: center;
+        }
+        section {
+            padding: 20px;
+        }
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>欢迎来到言夏的假日小居</h1>
+    </header>
+    <nav>
+        <a href="#home">主页</a>
+        <a href="#consultation">咨询区</a>
+        <a href="#about">简介区</a>
+        <a href="https://www.deepseek.com">留言区</a>
+    </nav>
+    <div id="info-modules">
+        <div class="time">
+            <h3>当前时间</h3>
+            <p id="current-time">加载中...</p>
+        </div>
+        <div class="weather">
+            <h3>天气信息</h3>
+            <p id="weather-info">加载中...</p>
+            <p id="weather-location">位置：加载中...</p>
+        </div>
+    </div>
+    <div>
+        <h2>敬请期待喵~</h2>
+    </div>
+    
+    <!-- <section id="home">
+        <h2>主页</h2>
+        <p>欢迎来到我的博客主页，敬请期待更新！</p>
+    </section>
+    <section id="consultation">
+        <h2>咨询区</h2>
+        <p>有问题吗？欢迎在此区域提问。</p>
+    </section>
+    <section id="about">
+        <h2>简介区</h2>
+        <p>这个博客是为了分享知识和想法而创建的。在这里了解更多关于我的信息。</p>
+    </section>
+    <section id="feedback">
+        <h2>留言区</h2>
+        <p>请在下方留下您的评论和建议：</p>
+        <form>
+            <textarea rows="5" cols="50" placeholder="您的留言..."></textarea><br>
+            <button type="submit">提交</button>
+        </form>
+    </section> -->
+    <footer>
+        <p>&copy; 2025 CASARX博客。版权所有。</p>
+        <p>联系邮箱：<a href="mailto:casarx05@gmail.com">casarx05@gmail.com</a></p>
+        <p>GitHub: <a href="https://github.com/Casaer-X">Casaer-X</a></p>
+        <p><a href="http://beian.miit.gov.cn/">渝ICP备2025058497号-1</a></p>
+    </footer>
+    <script>
+        // 更新当前时间
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            document.getElementById('current-time').textContent = timeString;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // 模拟天气信息
+        document.getElementById('weather-info').textContent = "晴天，25°C";
+
+        // 模拟位置信息
+        document.getElementById('weather-location').textContent = "位置：北京";
+    </script>
+</body>
+</html>
