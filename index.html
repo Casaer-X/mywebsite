@@ -104,6 +104,8 @@
                 <p id="weather-location">位置：加载中...</p>
             </div>
         </div>
+        <!-- 在 body 适当位置加上地图容器（可隐藏） -->
+        <div id="container" style="display:none"></div>
         <!-- 发布动态表单开始 -->
         <!-- <div id="post-form" style="max-width:600px;margin:30px auto 0 auto;padding:20px;background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
             <h3>发布新动态</h3>
@@ -163,13 +165,15 @@
         AMap.plugin(['AMap.CitySearch', 'AMap.Weather'], function () {
             var citySearch = new AMap.CitySearch();
             citySearch.getLocalCity(function (status, result) {
+                console.log('CitySearch:', status, result); // 调试用
                 if (status === 'complete' && result.info === 'OK') {
                     var city = result.city;
                     var cityCode = result.adcode || result.citycode;
-                    document.getElementById('weather-location').textContent = "位置：" + city;
+                    document.getElementById('weather-location').textContent = "位置：" + city + "（" + cityCode + "）";
 
                     var weather = new AMap.Weather();
                     weather.getLive(city, function(err, data) {
+                        console.log('Weather:', err, data); // 调试用
                         if (!err && data && data.weather && data.temperature) {
                             document.getElementById('weather-info').textContent = data.weather + "，" + data.temperature + "°C";
                         } else {
