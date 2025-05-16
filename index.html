@@ -4,17 +4,31 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>欢迎来到言夏的假日小居</title>
+        <script src="https://webapi.amap.com/loader.js"></script>
         <script type="text/javascript">
             window._AMapSecurityConfig = {
-            serviceHost: "https://casarx.top/_AMapService",
-            //例如 ：serviceHost:'http://1.1.1.1:80/_AMapService',
+            securityJsCode: "05f9e2e360c32925f1b92277633ffd12",
             };
-        </script>
-        <script src="https://webapi.amap.com/maps?v=1.4.15&key=fd148bd905490642991ecf5a540edeeb"></script>
-        <script type="text/javascript">
-             var map = new AMap.Map('container', {
-            center:[117.000923,36.675807],
-            zoom:11
+            AMapLoader.load({
+                key: "fd148bd905490642991ecf5a540edeeb", //申请好的 Web 端开发 Key，首次调用 load 时必填
+                version: "2.0", //指定要加载的 JS API 的版本，缺省时默认为 1.4.15
+                plugins: ["AMap.Scale"], //需要使用的的插件列表，如比例尺'AMap.Scale'，支持添加多个如：['AMap.Scale','...','...']
+            AMapUI: {
+            //是否加载 AMapUI，缺省不加载
+                version: "1.1", //AMapUI 版本
+                plugins: ["overlay/SimpleMarker"], //需要加载的 AMapUI ui 插件
+                },
+                Loca: {
+                //是否加载 Loca， 缺省不加载
+                version: "2.0", //Loca 版本
+                },
+            })
+            .then((AMap) => {
+                var map = new AMap.Map("container"); //"container"为 <div> 容器的 id
+                map.addControl(new AMap.Scale()); //添加比例尺组件到地图实例上
+            })
+            .catch((e) => {
+                console.error(e); //加载错误提示
             });
         </script>
 
