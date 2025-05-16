@@ -4,7 +4,14 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>欢迎来到言夏的假日小居</title>
-        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script src="https://webapi.amap.com/maps?v=1.4.15&key=fd148bd905490642991ecf5a540edeeb"></script>
+        <script type="text/javascript">
+             var map = new AMap.Map('container', {
+            center:[117.000923,36.675807],
+            zoom:11
+            });
+        </script>
+
         <!-- 设置浏览器标签页图标 -->
         <link rel="icon" href="icon/casarx.ico" >
         <style>
@@ -153,66 +160,28 @@
         }
 
         // 动态获取并显示天气和位置
-        function GetLocation(func) {
-            let that = {
-                setSQCookie,
-                getSQCookie
-            };
-            let locationCookie = that.getSQCookie('sunqBlogLocation');
-            let sunqBlogLocationCode = that.getSQCookie('sunqBlogLocationCode');
+        AMap.plugin(['AMap.CitySearch', 'AMap.Weather'], function () {
+            var citySearch = new AMap.CitySearch();
+            citySearch.getLocalCity(function (status, result) {
+                if (status === 'complete' && result.info === 'OK') {
+                    var city = result.city;
+                    var cityCode = result.adcode || result.citycode;
+                    document.getElementById('weather-location').textContent = "位置：" + city;
 
-            if (locationCookie && sunqBlogLocationCode) {
-                func(locationCookie, sunqBlogLocationCode);
-            } else {
-                axios({
-                    url: 'https://restapi.amap.com/v3/ip',
-                    method: 'get',
-                    params: {
-                        key: 'fd148bd905490642991ecf5a540edeeb'
-                    },
-                }).then(function (resp) {
-                    let city = resp.data.city;
-                    let adcode = resp.data.adcode;
-                    func(city, adcode);
-                    that.setSQCookie('sunqBlogLocation', city, 3);
-                    that.setSQCookie('sunqBlogLocationCode', adcode, 3);
-                }).catch(function () {
-                    document.getElementById('weather-location').textContent = "位置获取失败";
-                });
-            }
-        }
-
-        function getWeathData(cityName, cityCode) {
-            let that = {
-                setSQCookie
-            };
-            axios({
-                url: "https://restapi.amap.com/v3/weather/weatherInfo",
-                method: "GET",
-                params: {
-                    key: "fd148bd905490642991ecf5a540edeeb",
-                    city: cityCode,
-                    extensions: 'base',
-                    output: "JSON"
-                },
-            }).then(function (resp) {
-                if (resp.data.status === "1" && resp.data.lives && resp.data.lives.length > 0) {
-                    let weather = resp.data.lives[0];
-                    document.getElementById('weather-info').textContent = weather.weather + "，" + weather.temperature + "°C";
-                    document.getElementById('weather-location').textContent = "位置：" + weather.city;
-                    that.setSQCookie("sunqBlogWeather", resp.data, 3);
+                    var weather = new AMap.Weather();
+                    weather.getLive(city, function(err, data) {
+                        if (!err && data && data.weather && data.temperature) {
+                            document.getElementById('weather-info').textContent = data.weather + "，" + data.temperature + "°C";
+                        } else {
+                            document.getElementById('weather-info').textContent = "天气获取失败";
+                        }
+                    });
                 } else {
+                    document.getElementById('weather-location').textContent = "位置获取失败";
                     document.getElementById('weather-info').textContent = "天气获取失败";
-                    document.getElementById('weather-location').textContent = "位置：" + cityName;
                 }
-            }).catch(function () {
-                document.getElementById('weather-info').textContent = "天气获取失败";
-                document.getElementById('weather-location').textContent = "位置：" + cityName;
             });
-        }
-
-        // 页面加载时调用
-        GetLocation(getWeathData);
+        });
         </script>
     </body>
 </html>
