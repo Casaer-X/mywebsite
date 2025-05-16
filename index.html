@@ -4,6 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>欢迎来到言夏的假日小居</title>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
         <!-- 设置浏览器标签页图标 -->
         <link rel="icon" href="icon/casarx.ico" >
         <style>
@@ -139,24 +140,79 @@
         setInterval(updateTime, 1000);
         updateTime();
 
-        // 模拟天气信息
-        document.getElementById('weather-info').textContent = "晴天，25°C";
+        // 简单的 Cookie 工具函数
+        function setSQCookie(name, value, hours) {
+            let d = new Date();
+            d.setTime(d.getTime() + (hours * 60 * 60 * 1000));
+            document.cookie = name + "=" + encodeURIComponent(JSON.stringify(value)) + ";expires=" + d.toUTCString() + ";path=/";
+        }
+        function getSQCookie(name) {
+            let arr = document.cookie.match(new RegExp("(^| )" + name + "=([^;]*)(;|$)"));
+            if (arr != null) return JSON.parse(decodeURIComponent(arr[2]));
+            return null;
+        }
 
-        // 模拟位置信息
-        document.getElementById('weather-location').textContent = "位置：北京";
+        // 动态获取并显示天气和位置
+        function GetLocation(func) {
+            let that = {
+                setSQCookie,
+                getSQCookie
+            };
+            let locationCookie = that.getSQCookie('sunqBlogLocation');
+            let sunqBlogLocationCode = that.getSQCookie('sunqBlogLocationCode');
 
-        // 预留发布动态接口
-        document.getElementById('post-btn').addEventListener('click', function() {
-            const title = document.getElementById('post-title').value.trim();
-            const content = document.getElementById('post-content').value.trim();
-            if (!title || !content) {
-                alert('请填写标题和内容');
-                return;
+            if (locationCookie && sunqBlogLocationCode) {
+                func(locationCookie, sunqBlogLocationCode);
+            } else {
+                axios({
+                    url: 'https://restapi.amap.com/v3/ip',
+                    method: 'get',
+                    params: {
+                        key: 'fd148bd905490642991ecf5a540edeeb'
+                    },
+                }).then(function (resp) {
+                    let city = resp.data.city;
+                    let adcode = resp.data.adcode;
+                    func(city, adcode);
+                    that.setSQCookie('sunqBlogLocation', city, 3);
+                    that.setSQCookie('sunqBlogLocationCode', adcode, 3);
+                }).catch(function () {
+                    document.getElementById('weather-location').textContent = "位置获取失败";
+                });
             }
-            // 这里预留后续发布动态的逻辑
-            // 例如：addPostToWaterfall(title, content);
-            alert('发布接口预留，后续可实现动态添加');
-        });
+        }
+
+        function getWeathData(cityName, cityCode) {
+            let that = {
+                setSQCookie
+            };
+            axios({
+                url: "https://restapi.amap.com/v3/weather/weatherInfo",
+                method: "GET",
+                params: {
+                    key: "fd148bd905490642991ecf5a540edeeb",
+                    city: cityCode,
+                    extensions: 'base',
+                    output: "JSON"
+                },
+            }).then(function (resp) {
+                if (resp.data.status === "1" && resp.data.lives && resp.data.lives.length > 0) {
+                    let weather = resp.data.lives[0];
+                    document.getElementById('weather-info').textContent = weather.weather + "，" + weather.temperature + "°C";
+                    document.getElementById('weather-location').textContent = "位置：" + weather.city;
+                    that.setSQCookie("sunqBlogWeather", resp.data, 3);
+                } else {
+                    document.getElementById('weather-info').textContent = "天气获取失败";
+                    document.getElementById('weather-location').textContent = "位置：" + cityName;
+                }
+            }).catch(function () {
+                document.getElementById('weather-info').textContent = "天气获取失败";
+                document.getElementById('weather-location').textContent = "位置：" + cityName;
+            });
+        }
+
+        // 页面加载时调用
+        GetLocation(getWeathData);
         </script>
     </body>
 </html>
