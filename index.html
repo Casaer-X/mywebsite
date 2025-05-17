@@ -25,20 +25,20 @@
                 var map = new AMap.Map("container");
                 map.addControl(new AMap.Scale());
 
-                // 动态获取并显示天气和位置
+                // 动态获取并显示天气和位置（优先用IP定位，兼容移动网络）
                 AMap.plugin(['AMap.CitySearch', 'AMap.Weather'], function () {
                     var citySearch = new AMap.CitySearch();
-                    // 优先用高德定位
-                    citySearch.getLocalCity(function (status, result) {
-                        console.log('CitySearch:', status, result); // 调试用
-                        if (status === 'complete' && result.info === 'OK') {
-                            var city = result.city;
-                            var cityCode = result.adcode || result.citycode;
+                    // 先用IP定位
+                    citySearch.getCityByIp(function(ipStatus, ipResult){
+                        console.log('CitySearch by IP:', ipStatus, ipResult);
+                        if (ipStatus === 'complete' && ipResult.info === 'OK') {
+                            var city = ipResult.city;
+                            var cityCode = ipResult.adcode || ipResult.citycode;
                             document.getElementById('weather-location').textContent = "位置：" + city + "（" + cityCode + "）";
 
                             var weather = new AMap.Weather();
                             weather.getLive(city, function(err, data) {
-                                console.log('Weather:', err, data); // 调试用
+                                console.log('Weather by IP:', err, data);
                                 if (!err && data && data.weather && data.temperature) {
                                     document.getElementById('weather-info').textContent = data.weather + "，" + data.temperature + "°C";
                                 } else {
@@ -46,28 +46,8 @@
                                 }
                             });
                         } else {
-                            // 定位失败，尝试用IP定位
-                            citySearch.getCityByIp(function(ipStatus, ipResult){
-                                console.log('CitySearch by IP:', ipStatus, ipResult);
-                                if (ipStatus === 'complete' && ipResult.info === 'OK') {
-                                    var city = ipResult.city;
-                                    var cityCode = ipResult.adcode || ipResult.citycode;
-                                    document.getElementById('weather-location').textContent = "位置：" + city + "（" + cityCode + "）";
-
-                                    var weather = new AMap.Weather();
-                                    weather.getLive(city, function(err, data) {
-                                        console.log('Weather by IP:', err, data);
-                                        if (!err && data && data.weather && data.temperature) {
-                                            document.getElementById('weather-info').textContent = data.weather + "，" + data.temperature + "°C";
-                                        } else {
-                                            document.getElementById('weather-info').textContent = "天气获取失败";
-                                        }
-                                    });
-                                } else {
-                                    document.getElementById('weather-location').textContent = "位置获取失败";
-                                    document.getElementById('weather-info').textContent = "天气获取失败";
-                                }
-                            });
+                            document.getElementById('weather-location').textContent = "位置获取失败";
+                            document.getElementById('weather-info').textContent = "天气获取失败";
                         }
                     });
                 });
