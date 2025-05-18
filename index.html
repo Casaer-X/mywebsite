@@ -5,7 +5,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>欢迎来到言夏的假日小居</title>
         <script src="https://webapi.amap.com/loader.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
         <script type="text/javascript">
             window._AMapSecurityConfig = {
                 securityJsCode: "05f9e2e360c32925f1b92277633ffd12",
@@ -25,57 +24,66 @@
             .then((AMap) => {
                 var map = new AMap.Map("container");
                 map.addControl(new AMap.Scale());
+
+                // 动态获取并显示天气和位置
+                AMap.plugin(['AMap.CitySearch', 'AMap.Weather'], function () {
+                    var citySearch = new AMap.CitySearch();
+                    // 优先用高德定位
+                    citySearch.getLocalCity(function (status, result) {
+                        console.log('CitySearch:', status, result); // 调试用
+                        if (status === 'complete' && result.info === 'OK') {
+                            var city = result.city;
+                            var cityCode = result.adcode || result.citycode;
+                            document.getElementById('weather-location').textContent = "位置：" + city + "（" + cityCode + "）";
+
+                            var weather = new AMap.Weather();
+                            weather.getLive(city, function(err, data) {
+                                console.log('Weather:', err, data); // 调试用
+                                if (!err && data && data.weather && data.temperature) {
+                                    document.getElementById('weather-info').textContent = data.weather + "，" + data.temperature + "°C";
+                                } else {
+                                    document.getElementById('weather-info').textContent = "天气获取失败";
+                                }
+                            });
+                        } else {
+                            // 定位失败，尝试用IP定位
+                            citySearch.getCityByIp(function(ipStatus, ipResult){
+                                console.log('CitySearch by IP:', ipStatus, ipResult);
+                                if (ipStatus === 'complete' && ipResult.info === 'OK') {
+                                    var city = ipResult.city;
+                                    var cityCode = ipResult.adcode || ipResult.citycode;
+                                    document.getElementById('weather-location').textContent = "位置：" + city + "（" + cityCode + "）";
+
+                                    var weather = new AMap.Weather();
+                                    weather.getLive(city, function(err, data) {
+                                        console.log('Weather by IP:', err, data);
+                                        if (!err && data && data.weather && data.temperature) {
+                                            document.getElementById('weather-info').textContent = data.weather + "，" + data.temperature + "°C";
+                                        } else {
+                                            document.getElementById('weather-info').textContent = "天气获取失败";
+                                        }
+                                    });
+                                } else {
+                                    document.getElementById('weather-location').textContent = "位置获取失败";
+                                    document.getElementById('weather-info').textContent = "天气获取失败";
+                                }
+                            });
+                        }
+                    });
+                });
             })
             .catch((e) => {
                 console.error(e);
             });
-
-            // 获取城市和天气（兼容移动端）
-            function fetchWeather() {
-                // 1. 通过高德IP定位API获取城市adcode
-                axios.get('https://restapi.amap.com/v3/ip', {
-                    params: {
-                        key: 'fd148bd905490642991ecf5a540edeeb'
-                    }
-                }).then(function(resp) {
-                    if (resp.data && resp.data.city && resp.data.adcode) {
-                        var city = resp.data.city;
-                        var adcode = resp.data.adcode;
-                        document.getElementById('weather-location').textContent = "位置：" + city + "（" + adcode + "）";
-                        // 2. 用adcode查天气
-                        axios.get('https://restapi.amap.com/v3/weather/weatherInfo', {
-                            params: {
-                                key: 'fd148bd905490642991ecf5a540edeeb',
-                                city: adcode,
-                                extensions: 'base'
-                            }
-                        }).then(function(resp2) {
-                            if (resp2.data && resp2.data.lives && resp2.data.lives.length > 0) {
-                                var weather = resp2.data.lives[0];
-                                document.getElementById('weather-info').textContent = weather.weather + "，" + weather.temperature + "°C";
-                            } else {
-                                document.getElementById('weather-info').textContent = "天气获取失败";
-                            }
-                        }).catch(function() {
-                            document.getElementById('weather-info').textContent = "天气获取失败";
-                        });
-                    } else {
-                        document.getElementById('weather-location').textContent = "位置获取失败";
-                        document.getElementById('weather-info').textContent = "天气获取失败";
-                    }
-                }).catch(function() {
-                    document.getElementById('weather-location').textContent = "位置获取失败";
-                    document.getElementById('weather-info').textContent = "天气获取失败";
-                });
-            }
-
-            // 页面加载时调用
-            fetchWeather();
         </script>
 
         <!-- 设置浏览器标签页图标 -->
         <link rel="icon" href="icon/casarx.ico" >
         <style>
+            #head_title {
+                font-size: 24px;
+                color: white;
+            }
         a {
             color: white;
             text-decoration: none;
@@ -146,7 +154,7 @@
     </head>
     <body>
         <header>
-            <h1>欢迎来到言夏的假日小居</h1>
+            <h1 id="head_title">欢迎来到言夏的假日小居</h1>
         </header>
         <nav>
             <a href="#home">主页</a>
@@ -190,7 +198,7 @@
                 <h4>还没开发完啦</h4>
                 <p>你可以继续添加更多内容。</p>
             </div>
-            <!-- 可继续添加更多 .waterfall-item -->
+        <!-- 可继续添加更多 .waterfall-item -->
         </section>
         <!-- 瀑布流动态区结束 -->
 
@@ -216,7 +224,6 @@
             d.setTime(d.getTime() + (hours * 60 * 60 * 1000));
             document.cookie = name + "=" + encodeURIComponent(JSON.stringify(value)) + ";expires=" + d.toUTCString() + ";path=/";
         }
-
         function getSQCookie(name) {
             let arr = document.cookie.match(new RegExp("(^| )" + name + "=([^;]*)(;|$)"));
             if (arr != null) return JSON.parse(decodeURIComponent(arr[2]));
