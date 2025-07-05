@@ -1,10 +1,93 @@
 <!DOCTYPE html>
-<html lang="zh-CN"></html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>欢迎来到言夏的假日小居</title>
-    <style>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>欢迎来到言夏的假日小居</title>
+        <script src="https://webapi.amap.com/loader.js"></script>
+        <script type="text/javascript">
+            window._AMapSecurityConfig = {
+                securityJsCode: "05f9e2e360c32925f1b92277633ffd12",
+            };
+            AMapLoader.load({
+                key: "fd148bd905490642991ecf5a540edeeb",
+                version: "2.0",
+                plugins: ["AMap.Scale", "AMap.CitySearch", "AMap.Weather"],
+                AMapUI: {
+                    version: "1.1",
+                    plugins: ["overlay/SimpleMarker"],
+                },
+                Loca: {
+                    version: "2.0",
+                },
+            })
+            .then((AMap) => {
+                var map = new AMap.Map("container");
+                map.addControl(new AMap.Scale());
+
+                // 动态获取并显示天气和位置
+                AMap.plugin(['AMap.CitySearch', 'AMap.Weather'], function () {
+                    var citySearch = new AMap.CitySearch();
+                    // 优先用高德定位
+                    citySearch.getLocalCity(function (status, result) {
+                        console.log('CitySearch:', status, result); // 调试用
+                        if (status === 'complete' && result.info === 'OK') {
+                            var city = result.city;
+                            var cityCode = result.adcode || result.citycode;
+                            document.getElementById('weather-location').textContent = "位置：" + city + "（" + cityCode + "）";
+
+                            var weather = new AMap.Weather();
+                            weather.getLive(city, function(err, data) {
+                                console.log('Weather:', err, data); // 调试用
+                                if (!err && data && data.weather && data.temperature) {
+                                    document.getElementById('weather-info').textContent = data.weather + "，" + data.temperature + "°C";
+                                } else {
+                                    document.getElementById('weather-info').textContent = "天气获取失败";
+                                }
+                            });
+                        } else {
+                            // 定位失败，尝试用IP定位
+                            citySearch.getCityByIp(function(ipStatus, ipResult){
+                                console.log('CitySearch by IP:', ipStatus, ipResult);
+                                if (ipStatus === 'complete' && ipResult.info === 'OK') {
+                                    var city = ipResult.city;
+                                    var cityCode = ipResult.adcode || ipResult.citycode;
+                                    document.getElementById('weather-location').textContent = "位置：" + city + "（" + cityCode + "）";
+
+                                    var weather = new AMap.Weather();
+                                    weather.getLive(city, function(err, data) {
+                                        console.log('Weather by IP:', err, data);
+                                        if (!err && data && data.weather && data.temperature) {
+                                            document.getElementById('weather-info').textContent = data.weather + "，" + data.temperature + "°C";
+                                        } else {
+                                            document.getElementById('weather-info').textContent = "天气获取失败";
+                                        }
+                                    });
+                                } else {
+                                    document.getElementById('weather-location').textContent = "位置获取失败";
+                                    document.getElementById('weather-info').textContent = "天气获取失败";
+                                }
+                            });
+                        }
+                    });
+                });
+            })
+            .catch((e) => {
+                console.error(e);
+            });
+        </script>
+
+        <!-- 设置浏览器标签页图标 -->
+        <link rel="icon" href="icon/casarx.ico" >
+        <style>
+            #head_title {
+                font-size: 24px;
+                color: white;
+            }
+        a {
+            color: white;
+            text-decoration: none;
+        }
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -44,68 +127,110 @@
             padding: 20px;
         }
         footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
             background-color: #333;
             color: white;
             text-align: center;
             padding: 10px 0;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
+            z-index: 2;
+            opacity: 0.5;
         }
-    </style>
-</head>
-<body>
-    <header>
-        <h1>欢迎来到言夏的假日小居</h1>
-    </header>
-    <nav>
-        <a href="#home">主页</a>
-        <a href="#consultation">咨询区</a>
-        <a href="#about">简介区</a>
-        <a href="https://www.deepseek.com">留言区</a>
-    </nav>
-    <div id="info-modules">
-        <div class="time">
-            <h3>当前时间</h3>
-            <p id="current-time">加载中...</p>
+        #waterfall {
+            column-count: 3;
+            column-gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto 80px auto;
+        }
+        .waterfall-item {
+            background: #fff;
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            break-inside: avoid;
+        }
+        #bg-iframe {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            z-index: -1;
+        }
+
+        /* 让除背景外所有内容25%不透明 */
+        #main-content {
+            position: relative;
+            z-index: 1;
+            opacity: 0.5;
+            padding-bottom: 80px; /* 给内容区底部留出footer高度 */
+        }
+        </style>
+    </head>
+    <body>
+        <iframe id="bg-iframe" src="../流星滑动/Meteor.html" frameborder="0"></iframe>
+        <div id="main-content">
+            <header>
+                <h1 id="head_title">欢迎来到言夏的假日小居</h1>
+            </header>
+            <nav>
+                <a href="#home">主页</a>
+                <a href="#consultation">咨询区</a>
+                <a href="#about">简介区</a>
+                <a href="https://www.deepseek.com">留言区</a>
+            </nav>
+            <div id="info-modules">
+                <div class="time">
+                    <h3>当前时间</h3>
+                    <p id="current-time">加载中...</p>
+                </div>
+                <div class="weather">
+                    <h3>天气信息</h3>
+                    <p id="weather-info">加载中...</p>
+                    <p id="weather-location">位置：加载中...</p>
+                </div>
+            </div>
+            <!-- 在 body 适当位置加上地图容器（可隐藏） -->
+            <div id="container" style="display:none"></div>
+            <!-- 发布动态表单开始 -->
+            <!-- <div id="post-form" style="max-width:600px;margin:30px auto 0 auto;padding:20px;background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+                <h3>发布新动态</h3>
+                <input id="post-title" type="text" placeholder="动态标题" style="width:100%;padding:8px;margin-bottom:10px;border-radius:4px;border:1px solid #ccc;">
+                <textarea id="post-content" placeholder="动态内容" style="width:100%;padding:8px;height:60px;border-radius:4px;border:1px solid #ccc;"></textarea>
+                <button id="post-btn" style="margin-top:10px;padding:8px 16px;border:none;border-radius:4px;background:#333;color:#fff;cursor:pointer;">发布</button>
+            </div> -->
+            <!-- 发布动态表单结束 -->
+
+            <!-- 瀑布流动态区开始 -->
+            <section id="waterfall">
+                <div class="waterfall-item">
+                    <h4>还没开发完啦</h4>
+                    <p>什么都还没有哦</p>
+                </div>
+                <div class="waterfall-item">
+                    <h4>还没开发完啦</h4>
+                    <p>支持多条动态，自动排列。</p>
+                </div>
+                <div class="waterfall-item">
+                    <h4>还没开发完啦</h4>
+                    <p>你可以继续添加更多内容。</p>
+                </div>
+            <!-- 可继续添加更多 .waterfall-item -->
+            </section>
+            <!-- 瀑布流动态区结束 -->
         </div>
-        <div class="weather">
-            <h3>天气信息</h3>
-            <p id="weather-info">加载中...</p>
-            <p id="weather-location">位置：加载中...</p>
-        </div>
-    </div>
-    <div>
-        <h2>敬请期待喵~</h2>
-    </div>
-    
-    <!-- <section id="home">
-        <h2>主页</h2>
-        <p>欢迎来到我的博客主页，敬请期待更新！</p>
-    </section>
-    <section id="consultation">
-        <h2>咨询区</h2>
-        <p>有问题吗？欢迎在此区域提问。</p>
-    </section>
-    <section id="about">
-        <h2>简介区</h2>
-        <p>这个博客是为了分享知识和想法而创建的。在这里了解更多关于我的信息。</p>
-    </section>
-    <section id="feedback">
-        <h2>留言区</h2>
-        <p>请在下方留下您的评论和建议：</p>
-        <form>
-            <textarea rows="5" cols="50" placeholder="您的留言..."></textarea><br>
-            <button type="submit">提交</button>
-        </form>
-    </section> -->
-    <footer>
-        <p>&copy; 2025 CASARX博客。版权所有。</p>
-        <p>联系邮箱：<a href="mailto:casarx05@gmail.com">casarx05@gmail.com</a></p>
-        <p>GitHub: <a href="https://github.com/Casaer-X">Casaer-X</a></p>
-        <p><a href="http://beian.miit.gov.cn/">渝ICP备2025058497号-1</a></p>
-    </footer>
-    <script>
+        <footer>
+            <p>&copy; 2025 CASARX博客。版权所有。</p>
+            <p>联系邮箱：<a href="mailto:mail@casarx.top">mail@casarx.top</a></p>
+            <p>GitHub: <a href="https://github.com/Casaer-X">Casaer-X</a></p>
+            <p><a href="http://beian.miit.gov.cn/">渝ICP备2025058497号-1</a></p>
+        </footer>
+        <script>
         // 更新当前时间
         function updateTime() {
             const now = new Date();
@@ -115,11 +240,17 @@
         setInterval(updateTime, 1000);
         updateTime();
 
-        // 模拟天气信息
-        document.getElementById('weather-info').textContent = "晴天，25°C";
-
-        // 模拟位置信息
-        document.getElementById('weather-location').textContent = "位置：北京";
-    </script>
-</body>
+        // 简单的 Cookie 工具函数
+        function setSQCookie(name, value, hours) {
+            let d = new Date();
+            d.setTime(d.getTime() + (hours * 60 * 60 * 1000));
+            document.cookie = name + "=" + encodeURIComponent(JSON.stringify(value)) + ";expires=" + d.toUTCString() + ";path=/";
+        }
+        function getSQCookie(name) {
+            let arr = document.cookie.match(new RegExp("(^| )" + name + "=([^;]*)(;|$)"));
+            if (arr != null) return JSON.parse(decodeURIComponent(arr[2]));
+            return null;
+        }
+        </script>
+    </body>
 </html>
