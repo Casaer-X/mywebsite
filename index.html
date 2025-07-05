@@ -127,13 +127,16 @@
             padding: 20px;
         }
         footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
             background-color: #333;
             color: white;
             text-align: center;
             padding: 10px 0;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
+            z-index: 2;
+            opacity: 0.5;
         }
         #waterfall {
             column-count: 3;
@@ -150,58 +153,77 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             break-inside: avoid;
         }
+        #bg-iframe {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            z-index: -1;
+        }
+
+        /* 让除背景外所有内容25%不透明 */
+        #main-content {
+            position: relative;
+            z-index: 1;
+            opacity: 0.5;
+            padding-bottom: 80px; /* 给内容区底部留出footer高度 */
+        }
         </style>
     </head>
     <body>
-        <header>
-            <h1 id="head_title">欢迎来到言夏的假日小居</h1>
-        </header>
-        <nav>
-            <a href="#home">主页</a>
-            <a href="#consultation">咨询区</a>
-            <a href="#about">简介区</a>
-            <a href="https://www.deepseek.com">留言区</a>
-        </nav>
-        <div id="info-modules">
-            <div class="time">
-                <h3>当前时间</h3>
-                <p id="current-time">加载中...</p>
+        <iframe id="bg-iframe" src="流星滑动/Meteor.html" frameborder="0"></iframe>
+        <div id="main-content">
+            <header>
+                <h1 id="head_title">欢迎来到言夏的假日小居</h1>
+            </header>
+            <nav>
+                <a href="#home">主页</a>
+                <a href="#consultation">咨询区</a>
+                <a href="#about">简介区</a>
+                <a href="https://www.deepseek.com">留言区</a>
+            </nav>
+            <div id="info-modules">
+                <div class="time">
+                    <h3>当前时间</h3>
+                    <p id="current-time">加载中...</p>
+                </div>
+                <div class="weather">
+                    <h3>天气信息</h3>
+                    <p id="weather-info">加载中...</p>
+                    <p id="weather-location">位置：加载中...</p>
+                </div>
             </div>
-            <div class="weather">
-                <h3>天气信息</h3>
-                <p id="weather-info">加载中...</p>
-                <p id="weather-location">位置：加载中...</p>
-            </div>
+            <!-- 在 body 适当位置加上地图容器（可隐藏） -->
+            <div id="container" style="display:none"></div>
+            <!-- 发布动态表单开始 -->
+            <!-- <div id="post-form" style="max-width:600px;margin:30px auto 0 auto;padding:20px;background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+                <h3>发布新动态</h3>
+                <input id="post-title" type="text" placeholder="动态标题" style="width:100%;padding:8px;margin-bottom:10px;border-radius:4px;border:1px solid #ccc;">
+                <textarea id="post-content" placeholder="动态内容" style="width:100%;padding:8px;height:60px;border-radius:4px;border:1px solid #ccc;"></textarea>
+                <button id="post-btn" style="margin-top:10px;padding:8px 16px;border:none;border-radius:4px;background:#333;color:#fff;cursor:pointer;">发布</button>
+            </div> -->
+            <!-- 发布动态表单结束 -->
+
+            <!-- 瀑布流动态区开始 -->
+            <section id="waterfall">
+                <div class="waterfall-item">
+                    <h4>还没开发完啦</h4>
+                    <p>什么都还没有哦</p>
+                </div>
+                <div class="waterfall-item">
+                    <h4>还没开发完啦</h4>
+                    <p>支持多条动态，自动排列。</p>
+                </div>
+                <div class="waterfall-item">
+                    <h4>还没开发完啦</h4>
+                    <p>你可以继续添加更多内容。</p>
+                </div>
+            <!-- 可继续添加更多 .waterfall-item -->
+            </section>
+            <!-- 瀑布流动态区结束 -->
         </div>
-        <!-- 在 body 适当位置加上地图容器（可隐藏） -->
-        <div id="container" style="display:none"></div>
-        <!-- 发布动态表单开始 -->
-        <!-- <div id="post-form" style="max-width:600px;margin:30px auto 0 auto;padding:20px;background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
-            <h3>发布新动态</h3>
-            <input id="post-title" type="text" placeholder="动态标题" style="width:100%;padding:8px;margin-bottom:10px;border-radius:4px;border:1px solid #ccc;">
-            <textarea id="post-content" placeholder="动态内容" style="width:100%;padding:8px;height:60px;border-radius:4px;border:1px solid #ccc;"></textarea>
-            <button id="post-btn" style="margin-top:10px;padding:8px 16px;border:none;border-radius:4px;background:#333;color:#fff;cursor:pointer;">发布</button>
-        </div> -->
-        <!-- 发布动态表单结束 -->
-
-        <!-- 瀑布流动态区开始 -->
-        <section id="waterfall">
-            <div class="waterfall-item">
-                <h4>还没开发完啦</h4>
-                <p>什么都还没有哦</p>
-            </div>
-            <div class="waterfall-item">
-                <h4>还没开发完啦</h4>
-                <p>支持多条动态，自动排列。</p>
-            </div>
-            <div class="waterfall-item">
-                <h4>还没开发完啦</h4>
-                <p>你可以继续添加更多内容。</p>
-            </div>
-        <!-- 可继续添加更多 .waterfall-item -->
-        </section>
-        <!-- 瀑布流动态区结束 -->
-
         <footer>
             <p>&copy; 2025 CASARX博客。版权所有。</p>
             <p>联系邮箱：<a href="mailto:mail@casarx.top">mail@casarx.top</a></p>
