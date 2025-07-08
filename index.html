@@ -264,7 +264,7 @@
                 <a href="#home">主页</a>
                 <a href="#consultation">咨询区</a>
                 <a href="#about">简介区</a>
-                <a href="">留言区</a>
+                <a href="#chat" id="chat-link">留言区</a>
             </nav>
             <div id="info-modules">
                 <div class="time">
@@ -310,7 +310,7 @@
         <div id="chat-popup">
             <div id="chat-popup-content">
                 <span id="chat-popup-close">&times;</span>
-                <iframe src="https://chat.deepseek.com" frameborder="0"></iframe>
+                <iframe src="https://www.deepseek.com" frameborder="0"></iframe>
             </div>
         </div>
         <footer>
@@ -342,7 +342,7 @@
         }
 
         // 弹出留言对话框
-        document.querySelector('a[href="https://www.deepseek.com"]').addEventListener('click', function(e) {
+        document.getElementById('chat-link').addEventListener('click', function(e) {
             e.preventDefault();
             const popup = document.getElementById('chat-popup');
             const content = document.getElementById('chat-popup-content');
