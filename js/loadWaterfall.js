@@ -40,7 +40,7 @@ function loadMoreWaterfall() {
 
 // 页面加载时从后端获取数据
 document.addEventListener('DOMContentLoaded', function() {
-    fetch('http://data.casarx.top:3000/waterfall')
+    fetch('https://data.casarx.top:3000/waterfall')
         .then(res => res.json())
         .then(data => {
             allItems = data;
