@@ -170,3 +170,42 @@ footer {
 #chat-popup-content.popup-out {
     animation: popup-fade-out 0.3s cubic-bezier(.4,0,.2,1);
 }
+#loading-mask {
+    position: fixed;
+    z-index: 99999;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(255,255,255,0.95);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.4s;
+}
+.loader {
+    border: 6px solid #eee;
+    border-top: 6px solid #021120;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg);}
+    100% { transform: rotate(360deg);}
+}
+.loading-text {
+    font-size: 18px;
+    color: #021120;
+    letter-spacing: 2px;
+}
+#loading-mask.dark {
+    background: rgba(10,18,32,0.95);
+}
+#loading-mask.dark .loader {
+    border: 6px solid #222;
+    border-top: 6px solid #409eff;
+}
+#loading-mask.dark .loading-text {
+    color: #409eff;
+}

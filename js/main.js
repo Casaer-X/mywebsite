@@ -50,3 +50,19 @@ document.getElementById('chat-popup-close').onclick = closePopup;
 document.getElementById('chat-popup').addEventListener('click', function(e) {
     if (e.target === this) closePopup();
 });
+
+window.addEventListener('load', function() {
+    const mask = document.getElementById('loading-mask');
+    if(mask){
+        mask.style.opacity = '0';
+        setTimeout(() => mask.style.display = 'none', 400);
+    }
+});
+
+(function() {
+    const hour = new Date().getHours();
+    const loadingMask = document.getElementById('loading-mask');
+    if (loadingMask && (hour >= 18 || hour < 5)) {
+        loadingMask.classList.add('dark');
+    }
+})();
