@@ -66,3 +66,26 @@ window.addEventListener('load', function() {
         loadingMask.classList.add('dark');
     }
 })();
+
+let lastScrollTop = 0;
+let footerHidden = false;
+
+window.addEventListener('scroll', function() {
+    const footer = document.querySelector('footer');
+    const st = window.pageYOffset || document.documentElement.scrollTop;
+    // 向下滑动时隐藏footer并加载更多
+    if (st > lastScrollTop + 10 && !footerHidden) {
+        footer.style.transform = 'translateY(100%)';
+        footerHidden = true;
+        // 加载剩余瀑布流
+        if (typeof window.loadMoreWaterfall === 'function') {
+            window.loadMoreWaterfall();
+        }
+    }
+    // 向上滑动时显示footer
+    if (st < lastScrollTop - 10 && footerHidden) {
+        footer.style.transform = 'translateY(0)';
+        footerHidden = false;
+    }
+    lastScrollTop = st <= 0 ? 0 : st;
+});
